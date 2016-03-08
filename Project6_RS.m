@@ -33,11 +33,13 @@ tplot = tmax/nplots;                % time interval between plots
 nsteps = length(t);                 % number of steps in loop
 nframe = 0;                         % initializing counter for plotting
 
-% initializing constants
+% initializing constants and looped values
 
 n = 0.030;                          % roughness coefficient, gravel bed
 se = s;                             % energy slope
 
+Q = zeros(1,N);
+dQdx = zeros(1,N);
 %% Loop
 
 for i=2:nsteps
@@ -46,32 +48,32 @@ for i=2:nsteps
  ubar = (1/n)*hedge.^(2/3)*se^(1/2);
  
  % top of slope, so no water added from above, boundary condition
- q(1) = 0; 
- q(2:N) = ubar.* hedge;
+ Q(1) = 0; 
+ Q(2:N) = ubar.* hedge;
  
  % find change in flux, add boundary condition to let water out of system
- dqdx(1:N-1) = diff(q)/dx;
- dqdx(N) = dqdx(N-1);
+ dQdx(1:N-1) = diff(Q)/dx;
+ dQdx(N) = dQdx(N-1);
  
- dhdt = -dqdx + R - I;
+ dhdt = -dQdx + R - I;
 
  % Update water height
  H = H + dhdt* dt;
  z = zbas + H;
  
- Hbelow = find(H<0); % just like with corals, we make sure water not negative
+ Hbelow = find(H<=0); % just like with corals, make sure water not negative
  H(Hbelow)=0;
-% Plotting a limited number of plots
+ % Plotting a limited number of plots
 
  if(mod(t(i),tplot)==0)
-nframe = nframe+1;
+ nframe = nframe+1;
     figure(1)
    
     plot(x,zbas,'k')
     hold on
     plot(x,z,'r')
 
-% Converting time to a string to print string out
+    % Converting time to a string to print string out
 
     trounded = round(t(i),0);
     strtime = num2str(trounded);
