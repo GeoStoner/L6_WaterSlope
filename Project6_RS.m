@@ -3,8 +3,8 @@ clear
 clc
 %% initialize
 % Rainwater movement
-R = 0.005;                          % m/s, recharge rate
-I = 0.0045;                         % m/s, infiltration rate
+R = 0.00005;                          % m/s, recharge rate
+I = 0.00002;                         % m/s, infiltration rate
 
 % Creating the basement
 zmax = 8;                           % m, initial height
@@ -21,7 +21,7 @@ initH =ones(1,N);           % m
 H = 0*initH;                        % m
 
 % find edge values
-hedge(1:N-1) = H(1:N)-1)+diff(H)/2;
+hedge(1:N-1) = H(1:N-1)+diff(H)/2;
 
 % initializing time
 tmax = 30000;                       % s
@@ -40,14 +40,14 @@ se = s;                             % energy slope
 
 %% Loop
 
-for i=1:nsteps
+for i=2:nsteps
  
  % find mean speed of water/fluid
  ubar = (1/n)*hedge.^(2/3)*se^(1/2);
- q(2:N) = ubar.* hedge;
  
  % top of slope, so no water added from above, boundary condition
  q(1) = 0; 
+ q(2:N) = ubar.* hedge;
  
  % find change in flux, add boundary condition to let water out of system
  dqdx(1:N-1) = diff(q)/dx;
