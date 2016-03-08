@@ -3,8 +3,8 @@ clear
 clc
 %% initialize
 % Rainwater movement
-R = 0.00005;                          % m/s, recharge rate
-I = 0.00002;                         % m/s, infiltration rate
+R = 0.05;                         % m/s, recharge rate
+I = 0.02;                         % m/s, infiltration rate
 
 % Creating the basement
 zmax = 8;                           % m, initial height
@@ -17,17 +17,17 @@ N = length(x);                      % used for matrix sizes
 zbas = zmax - s*x;                  % m
 
 % initial water height
-initH =ones(1,N);           % m
+initH =ones(1,N);                   % m
 H = 0*initH;                        % m
 
 % find edge values
 hedge(1:N-1) = H(1:N-1)+diff(H)/2;
 
 % initializing time
-tmax = 30000;                       % s
-dt = 0.1;                           % s
+tmax = 40;                         % s
+dt = 0.002;                        % s
 t = 0:dt:tmax;                      % s
-nplots = 20;                        % number of plots
+nplots = 40;                        % number of plots
 tplot = tmax/nplots;                % time interval between plots
 
 nsteps = length(t);                 % number of steps in loop
@@ -42,7 +42,7 @@ Q = zeros(1,N);
 dQdx = zeros(1,N);
 %% Loop
 
-for i=2:nsteps
+for i=1:nsteps
  
  % find mean speed of water/fluid
  ubar = (1/n)*hedge.^(2/3)*se^(1/2);
@@ -57,9 +57,10 @@ for i=2:nsteps
  
  dhdt = -dQdx + R - I;
 
- % Update water height
+ % Update water height and hedge
  H = H + dhdt* dt;
  z = zbas + H;
+ hedge(1:N-1) = H(1:N-1)+diff(H)/2;
  
  Hbelow = find(H<=0); % just like with corals, make sure water not negative
  H(Hbelow)=0;
@@ -80,14 +81,14 @@ for i=2:nsteps
 
 
     txt = uicontrol('Style','text',...
-      'Position',[430 0 80 20],...
+      'Position',[430 0 120 20],...
       'Fontsize',12,...
       'FontWeight','Bold',... 
       'HorizontalAlignment','left',...
-      'String',['Time: ' strtime]);
+      'String',['Time: ' strtime ' seconds']);
 
     xlabel('distance (km)')
-    ylabel('elevation (m)')
+    ylabel('water height (m)')
     title('Movement of Water over Land Surface')
 
 
