@@ -107,7 +107,7 @@ for i=1:nsteps
       'HorizontalAlignment','left',...
       'String',['Time: ' strtime ' seconds']);
 
-    xlabel('distance (km)')
+    xlabel('distance (m)')
     ylabel('water height (m)')
     xlim([xmin+dx xmax])
     ylim([zmax-s*x(N) zmax])
