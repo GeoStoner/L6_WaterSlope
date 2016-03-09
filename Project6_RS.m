@@ -11,7 +11,7 @@ zmax = 8;                           % m, initial height
 s = 0.05;                           % slope
 xmax = 100;                         % m
 xmin = 0;                           % m
-dx = 2;                             % m
+dx = 1;                             % m
 x = xmin:dx:xmax;                   % m
 N = length(x);                      % used for matrix sizes
 zbas = zmax - s*x;                  % m
@@ -24,10 +24,10 @@ H = 0*initH;                        % m
 hedge(1:N-1) = H(1:N-1)+diff(H)/2;
 
 % initializing time
-tmax = 40;                         % s
+tmax = 25;                         % s
 dt = 0.002;                        % s
 t = 0:dt:tmax;                      % s
-nplots = 40;                        % number of plots
+nplots = 60;                        % number of plots
 tplot = tmax/nplots;                % time interval between plots
 
 nsteps = length(t);                 % number of steps in loop
@@ -38,8 +38,11 @@ nframe = 0;                         % initializing counter for plotting
 n = 0.030;                          % roughness coefficient, gravel bed
 se = s;                             % energy slope
 
+ubar = zeros(1,N);
 Q = zeros(1,N);
 dQdx = zeros(1,N);
+dhdt = zeros(1,N);
+
 %% Loop
 
 for i=1:nsteps
@@ -71,9 +74,23 @@ for i=1:nsteps
     figure(1)
    
     plot(x,zbas,'k')
+    
+    % Filling in area
+    baseval1 = -10000;
+    
+    
+    % Plot of water height
     hold on
     plot(x,z,'r')
-
+    
+    baseval1 = -10000;
+    a2 = area(x,z);
+    ec = a2.FaceColor;
+    a2.FaceColor = [0 0 1];
+    baseval1 = -10000;
+    a1 = area(zbas);
+    ec = a1.FaceColor;
+    a1.FaceColor = [0 1 1];
     % Converting time to a string to print string out
 
     trounded = round(t(i),0);
@@ -89,6 +106,8 @@ for i=1:nsteps
 
     xlabel('distance (km)')
     ylabel('water height (m)')
+    xlim([xmin+dx xmax])
+    ylim([zmax-s*x(N) zmax])
     title('Movement of Water over Land Surface')
 
 
@@ -101,5 +120,26 @@ end
 %% Close
 
 % Analytical Solution
+Qan = (R-I)*x;
+Han = nthroot(( ((R-I)*x*n)/(se^(1/2))).^3,5);
 
-Han = nthroot((((R-I)*x)/((1/n)*se^1/2)).^3,5);
+% Printing verification of numerical solution and analytical solution
+ if(abs(Qan-Q)<=0.001)
+     outstrq = 'The analytical and numerical solution for Q match \n'; 
+     fprintf(outstrq);
+ else
+     outstrqneg = 'The analytical and numerical solution for Q DO NOT match \n'; 
+     fprintf(outstrqneg);
+ end
+ 
+ % H is harder to match exactly, but smaller space and time steps improve
+ % results.
+  if(abs(Han-H)<=0.1)
+     outstrH = 'The analytical and numerical solution for H match \n'; 
+     fprintf(outstrH);
+ else
+     outstrHneg = 'The analytical and numerical solution for H DO NOT match \n'; 
+     fprintf(outstrHneg);
+ end
+ 
+
